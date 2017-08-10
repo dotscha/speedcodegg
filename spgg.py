@@ -1,9 +1,12 @@
 import sys
 
-param = ord('.')		# will be $ff
-separator = ord(' ')	# will be $ea
+#param = ord('.')		# will be $ff
+#separator = ord(' ')	# will be $ea
 
-pseudoByte = 'byt'
+param = 0xff
+separator = 0xea
+
+pseudoByte = '!byte'
 
 dataFile = sys.argv[1]
 patternsFile = sys.argv[2]
@@ -39,10 +42,10 @@ for i in range(patterns.count(separator)):
 	patterns = patterns[sep+1:]
 	streams = streams[sep+1:]
 
-print ("data")
-print (data)
-print ("pattern")
-print (pattern)
+#print ("data")
+#print (data)
+#print ("pattern")
+#print (pattern)
 
 # check if matching
 def matching(data, pos, patt):
@@ -77,7 +80,7 @@ while pos<len(data):
 	if best!=None:
 		matches.append(best)
 		pos += len(best[0])
-		print ("match: {m}".format(m=best))
+		#print ("match: {m}".format(m=best))
 	else:
 		print ("ERROR: No pattern found at {a}".format(a=hex(dataAddr+pos)),file=sys.stderr)
 		exit(1)
@@ -169,8 +172,6 @@ def splitDataIntoStreams(data, stre, m):
 	return m
 
 def writeStream(s,data,comment=None):
-	print (s)
-	print (data)
 	if not s in outData:
 		outData[s] = open(outPrefix+"_spdata_{s}.asm".format(s=s),'w')
 		print ("speedcode_data_{s}:".format(s=s),file=outData[s])
@@ -188,13 +189,23 @@ print ("speedcode_data:",file=outData[0])
 
 pattIdx = { patt:(i,extractStreams(patt,pattern[patt])) for patt,i in pattIdx }
 
-print ("pattIdx")
-print (pattIdx)
+#print ("pattIdx")
+#print (pattIdx)
 
 for patt,params in matches:
 	ds = splitDataIntoStreams(params,pattIdx[patt][1],{0:[pattIdx[patt][0]]})
-	print (ds)
 	for s,data in ds.items():
 		writeStream(s,data)
+		
 writeStream(0,[0],"the end")
-	
+
+for s,f in outData.items():
+	if s!=0:
+		print ("",file=f)
+		print ("get_param_{s}:".format(s=s),file=f)
+		print ("\tlda speedcode_data_{s}".format(s=s),file=f)
+		print ("\tinc get_param_{s}+1".format(s=s),file=f)
+		print ("\tbne *+5",file=f)
+		print ("\tinc get_param_{s}+2".format(s=s),file=f)
+		print ("\trts",file=f)
+	f.close()
