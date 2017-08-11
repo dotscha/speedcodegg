@@ -83,8 +83,9 @@ while pos<len(data):
 		#print ("match: {m}".format(m=best))
 	else:
 		print ("ERROR: No pattern found at {a}".format(a=hex(dataAddr+pos)),file=sys.stderr)
-		exit(1)
-
+		#exit(1)
+		break
+	
 if len(data)<pos:
 	print ("WARNING: Partial match at the end overrun by {i} bytes.".format(i=pos-len(data)))
 
@@ -114,9 +115,9 @@ print ("\tldx #0",file=outGen)
 print ("writer_loop:",file=outGen)
 print ("\tjsr get_param",file=outGen)
 print ("\ttay",file=outGen)
-print ("\tlda patt_write_lo,y",file=outGen)
+print ("\tlda patt_writer_lo,y",file=outGen)
 print ("\tsta jump_to",file=outGen)
-print ("\tlda patt_write_hi,y",file=outGen)
+print ("\tlda patt_writer_hi,y",file=outGen)
 print ("\tsta jump_to+1",file=outGen)
 print ("\tldy #0",file=outGen)
 print ("jump_to = *+1",file=outGen)
