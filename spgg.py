@@ -8,6 +8,11 @@ separator = 0xea
 
 pseudoByte = '!byte'
 
+if len(sys.argv)<3:
+	print ("Usage:")
+	print ("  spgg.py <speedcode prg> <patterns prg> [<streams prg>]")
+	exit(0)
+
 dataFile = sys.argv[1]
 patternsFile = sys.argv[2]
 streamsFile = None if len(sys.argv)<4 else sys.argv[3]
@@ -26,6 +31,7 @@ streams = None
 if streamsFile!=None:
 	streams = list(bytearray(open(streamsFile,'rb').read()))[2:]
 	streams.append(separator)
+	#streams = [ (0 if s==param else s) for s in streams ]
 	if len(patterns)!=len(streams) or not all([(p==param or p==s) for (p,s) in zip(patterns,streams)]):
 		print ("Patterns and streams are not aligned.",file=sys.stderr)
 		exit(1)
